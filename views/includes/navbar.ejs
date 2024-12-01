@@ -1,0 +1,63 @@
+<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/listings"><b>Quickart</b></a>
+                <!-- New Recommendations link -->
+                <a class="nav-link" href="/reviews/recommendations"><b>Top Recommendations</b></a>
+            </div>
+
+            <div class="navbar-nav ms-auto">
+                <form method="get" action="/listings/search" class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search Destination" aria-label="Search" name="searchTerm">
+                    <button class="btn searchBtn" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                </form>
+            </div>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/listings/new">Add New Listings</a>
+
+                <% if (!currUser) { %>
+                    <a class="nav-link" href="/signup"><b>Sign Up</b></a>
+                    <a class="nav-link" href="/login"><b>Log In</b></a>
+                <% } %>
+
+                <% if (currUser) { %>
+                    <a class="nav-link" href="/logout">Log Out</a>
+                    <a class="nav-link" href="/users/<%= currUser._id %>/likes">Open Favourites</a>
+                <% } %>
+
+                <!-- Language Selection -->
+                <div class="nav-item dropdown ms-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Language
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                        <li><button class="dropdown-item" onclick="changeLanguage('en')">English</button></li>
+                        <li><button class="dropdown-item" onclick="changeLanguage('hi')">हिंदी</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<script>
+    async function changeLanguage(lang) {
+        try {
+            const response = await fetch(`/?lng=${lang}`); // Pass language as query string
+            const text = await response.text();
+            document.getElementById('welcome-text').innerText = text;
+        } catch (error) {
+            console.error("Error changing language:", error);
+        }
+    }
+
+    // Set default content
+    changeLanguage('en');
+</script>

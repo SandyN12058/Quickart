@@ -1,0 +1,11 @@
+{
+    "welcome": "Welcome to Our E-commerce Site",
+    "product": {
+      "title": "Products",
+      "price": "Price",
+      "description": "Description"
+    },
+    "search": "Search",
+    "language": "Language"
+  }
+  

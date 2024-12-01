@@ -1,0 +1,154 @@
+<% layout("/layouts/boilerplate") %>
+<!-- Include Mapbox GL JS and CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+  const mapToken = "<%=process.env.MAP_TOKEN %>";
+  const listing = <%= JSON.stringify(listing) %>;
+</script>
+<div class="container">
+  <div class="row mt-5">
+    <div class="col-lg-8 mx-auto">
+      <h2 class="listing-title"><%= listing.title %></h2>
+      <div class="listing-card card">
+        <img src="<%=listing.image.url%>" class="card-img-top show-img" alt="Listing Image">
+        <div class="card-body">
+          <p class="card-text"><i>Owned By <%= listing.owner.username %></i></p>
+          <p class="card-text"><%= listing.description %></p>
+          <p class="card-text price">&#8377; <%= listing.price.toLocaleString("en-IN") %></p>
+          <p class="card-text location"><%= listing.location %></p>
+          <p class="card-text country"><%= listing.country %></p>
+
+          <% if (currUser) { %>
+            <form action="/listings/<%= listing._id %>/like" method="POST" style="display:inline;">
+              <button type="submit" class="like-btn">
+                <% if (currUser.likes.includes(listing._id)) { %>
+                  <i class="fa-solid fa-heart" style="color: red;"></i> <!-- Filled red heart for liked -->
+                <% } else { %>
+                  <i class="fa-regular fa-heart"></i> <!-- Hollow heart for not liked -->
+                <% } %>
+              </button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+
+      <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
+        <div class="btns">
+          <a href="/listings/<%=listing._id%>/edit" class="btn btn-primary edit-btn">Edit</a>
+          <form method="post" action="/listings/<%=listing._id%>?_method=DELETE" class="d-inline">
+            <button class="btn btn-danger">Delete</button>
+          </form>
+        </div>
+      <% } %>
+
+      <!-- Reviews -->
+      <div class="reviews-section mt-4">
+        <% if(currUser) { %>
+          <h4>Leave A Review</h4>
+          <form action="/listings/<%=listing.id%>/reviews" method="post" novalidate class="needs-validation">
+            <div class="mb-3">
+              <label for="rating" class="form-label">Rating</label>
+              <fieldset class="starability-slot">
+                <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                <label for="first-rate1" title="Terrible">1 star</label>
+                <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                <label for="first-rate2" title="Not good">2 stars</label>
+                <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                <label for="first-rate3" title="Average">3 stars</label>
+                <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                <label for="first-rate4" title="Very good">4 stars</label>
+                <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                <label for="first-rate5" title="Amazing">5 stars</label>
+              </fieldset>
+            </div>
+            <div class="mb-3">
+              <label for="comment" class="form-label">Comments</label>
+              <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control" required></textarea>
+              <div class="invalid-feedback">Add Comment</div>
+            </div>
+            <button class="btn btn-outline-primary">Submit</button>
+          </form>
+        <% } %>
+
+        <hr />
+
+        <p>All Reviews</p>
+        <div class="review-filters">
+          <a href="/listings/<%= listing._id %>?filter=positive" class="btn btn-success">Show Positive Reviews</a>
+          <a href="/listings/<%= listing._id %>?filter=negative" class="btn btn-danger">Show Negative Reviews</a>
+          <a href="/listings/<%= listing._id %>?filter=neutral" class="btn btn-warning">Show Neutral Reviews</a>
+          <a href="/listings/<%= listing._id %>" class="btn btn-dark">Show All Reviews</a>
+        </div>
+
+        <div class="row mt-3">
+          <% for (review of listing.reviews) { %>
+            <div class="card col-md-5 mx-3 mb-4 review-card">
+              <div class="card-body">
+                <h5 class="card-title">@<%= review.author.username %></h5>
+                <p class="card-text"><%= review.comment %></p>
+                <p class="sentiment-score" style="font-weight: bold;">
+                  <% if (review.sentimentScore > 0) { %>
+                    <span class="text-success">😊 Positive</span>
+                  <% } else if (review.sentimentScore < 0) { %>
+                    <span class="text-danger">😟 Negative</span>
+                  <% } else { %>
+                    <span class="text-warning">😐 Neutral</span>
+                  <% } %>
+                </p>
+                <p class="starability-result" data-rating="<%= review.rating %>"></p>
+                <% if (currUser && currUser._id.equals(review.author._id)) { %>
+                  <form method="post" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="d-inline">
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% } %>
+        </div>
+
+      </div>
+
+      <div class="map-section mt-5">
+        <h3>Where you'll be</h3>
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dynamically extract the last word from the title
+  const listingTitle = "<%= listing.title %>";  // Assuming listing title is passed from the server
+  const lastWord = listingTitle.split(' ').pop();  // Extracting the last word
+
+  // Initialize the map (Leaflet.js)
+  const map = L.map('map').setView([0, 0], 2);  // Default to [0, 0] zoomed out
+
+  // Set up OpenStreetMap tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Use Nominatim API (OpenStreetMap) to search for the last word of the title
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(lastWord)}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.length > 0) {
+        const lat = data[0].lat;   // Latitude
+        const lon = data[0].lon;   // Longitude
+
+        // Center the map at the found coordinates and zoom in
+        map.setView([lat, lon], 13);  // Zoom level 13 for better detail
+
+        // Add a marker to the map with a popup
+        L.marker([lat, lon]).addTo(map)
+          .bindPopup(`<b>Location: ${lastWord}</b>`)  // Popup showing the last word as location
+          .openPopup();
+      } else {
+        console.error('Location not found for:', lastWord);
+      }
+    })
+    .catch(error => console.error('Error fetching location data:', error));
+</script>
