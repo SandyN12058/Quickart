@@ -1,2 +1,2 @@
 # Quickart
-This is our major project.
+This is our final major project.
