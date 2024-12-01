@@ -13,7 +13,7 @@ module.exports.signUp=async(req,res)=>{  //eben if Wrap Async is there we add tr
         if(err){
             return next(err);
         }
-        req.flash("success","Welcome to wanderlust");
+        req.flash("success","Welcome to Quickart");
         res.redirect("/listings"); 
     });
      
@@ -25,7 +25,7 @@ module.exports.signUp=async(req,res)=>{  //eben if Wrap Async is there we add tr
 
 
 module.exports.logIn=async(req,res)=>{ //passport.authenticate() is MW which autenticate user before post route
-    req.flash("success","welcome to wanderlust You Are loggedin");
+    req.flash("success","Welcome, you are logged-in successfully!");
     let redirectUrl=res.locals.redirectUrl || "/listings"; //Ye iss liye krna pda kyuki jb hum simply login kr rhe the toh apna MW trigger nhi hua so no path in redirecturl  isilye ja uski value ho toh uspe o/w /listings pe
     res.redirect(redirectUrl);
 };
@@ -35,7 +35,7 @@ module.exports.logOut=(req,res)=>{
         if(err){
            return next(err); 
         }
-        req.flash("success","You are Logged Out now");
+        req.flash("success","Logged Out Successfully");
         res.redirect("/login");
     })
 };
