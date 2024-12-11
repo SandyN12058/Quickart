@@ -1,2 +1,1 @@
-# Quickart
-This is our final major project.
+# Quickart - A Real Estate Platform
