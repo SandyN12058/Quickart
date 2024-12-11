@@ -67,6 +67,6 @@ jobs:
             npm install
 
             # Restart the app using pm2
-            pm2 restart my-app || pm2 start app.js --name my-app
+            pm2 restart my-app || pm2 start sample.js --name my-app
 
           EOF

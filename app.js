@@ -77,9 +77,6 @@ const userRouter=require("./routes/user.js")
 const { maxHeaderSize } = require("http");
 
 
-const MONGO_URL="mongodb+srv://Samayk:Samyak454@cluster0.fpzxt.mongodb.net/Ecommerce?retryWrites=true&w=majority&appName=Cluster0";
-
-
 main().then(()=>{
     console.log("connected to db");
 }).catch((err)=>{
@@ -88,12 +85,8 @@ main().then(()=>{
 
 
 async function main(){
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(process.env.MONGO_URL);
 }
-
-
-
-
 
 
 
