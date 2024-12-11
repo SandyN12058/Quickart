@@ -163,5 +163,5 @@ const options = {
 };
 
 https.createServer(options, app).listen(443, () => {
-  console.log('Server running on https://quickart.ddns.net');
+  console.log('Server is running on https://quickart.ddns.net');
 });
