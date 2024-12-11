@@ -156,7 +156,6 @@ app.use((err,req,res,next)=>{
 
 const fs = require('fs');
 const https = require('https');
-const app = require('./app'); // Your Express app
 
 const options = {
   key: fs.readFileSync('/etc/letsencrypt/live/quickart.ddns.net/privkey.pem'),
