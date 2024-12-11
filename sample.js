@@ -110,8 +110,8 @@ if (process.env.NODE_ENV === "production") {
     const https = require('https');
 
     const options = {
-        key: fs.readFileSync('/etc/letsencrypt/live/quickart.ddns.net/privkey.pem'),
-        cert: fs.readFileSync('/etc/letsencrypt/live/quickart.ddns.net/fullchain.pem'),
+        key: fs.readFileSync('/home/ubuntu/ssl/privkey.pem'),
+        cert: fs.readFileSync('/home/ubuntu/ssl/fullchain.pem'),
     };
 
     https.createServer(options, app).listen(443, () => {
