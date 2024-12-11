@@ -154,8 +154,15 @@ app.use((err,req,res,next)=>{
     // res.status(status).send(message);
 })
 
-const PORT = 8000;
+const fs = require('fs');
+const https = require('https');
+const app = require('./app'); // Your Express app
 
-app.listen(PORT, '0.0.0.0', ()=>{
-    console.log(`Server is listining to port ${PORT}`);
-})
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/quickart.ddns.net/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/quickart.ddns.net/fullchain.pem'),
+};
+
+https.createServer(options, app).listen(443, () => {
+  console.log('Server running on https://quickart.ddns.net');
+});
